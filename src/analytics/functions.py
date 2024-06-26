@@ -1,5 +1,3 @@
-import json
-
 from .models import ProjectAnalytics
 from ..helpers.local_file_handler import read_file, read_lock_file
 

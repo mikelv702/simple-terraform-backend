@@ -45,6 +45,7 @@ class TerraformState(BaseModel):
 
     class Config:
         extra = "allow"
+        
 @app.api_route("/tfstate/lock", methods=["LOCK"])
 async def lock_state(lock: LockInfo):
     global lock_info
@@ -72,18 +73,11 @@ async def get_lock():
     if lock_info is None:
         return Response(status_code=404)
     return JSONResponse(content=lock_info.model_dump(), status_code=200)
-
-@app.post("/tfstate")
-async def update_terraform_state(ID: str, state: TerraformState):
-    logging.info(f"Update state file {ID}")
-    save_file(state.model_dump())
-    logging.debug(state)
-    return JSONResponse(content=state.model_dump())
-
-@app.get("/tfstate")
-async def get_terraform_state():
-    logging.info("Requesting State File")
-    state_returned = read_file()
+    
+@app.get("/tfstate/{project_id}")
+async def get_terraform_state_project(project_id:int):
+    logging.info(f"Requesting State File for project {project_id}")
+    state_returned = read_file(str(project_id))
     if state_returned is None:
         dummy_state = TerraformState(
             version=4,
@@ -97,3 +91,10 @@ async def get_terraform_state():
     else:
         returned_state = TerraformState(**state_returned)
         return JSONResponse(content=returned_state.model_dump())
+    
+@app.post("/tfstate/{project_id}")
+async def update_terraform_state_project(project_id: int, state: TerraformState):
+    logging.info(f"Update state file for project {project_id}")
+    save_file(state.model_dump(), str(project_id))
+    logging.debug(state)
+    return JSONResponse(content=state.model_dump())

@@ -11,6 +11,7 @@ from .helpers.local_file_handler import (save_file,
                                          read_lock_file, 
                                          delete_lock_file, 
                                          save_lock_file)
+from .analytics.route import router as analytics_router
 
 from .settings import settings
 
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title=settings.APP_NAME, 
               version=settings.APP_VERSION, 
               debug=settings.DEBUG)
-
+app.include_router(analytics_router)
 # IN MEMORY LOCK FILE! DO NOT USE IN PRODUCTION
 lock_info = None
 

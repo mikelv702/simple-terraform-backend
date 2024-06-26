@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 def save_file(json_data, project_id) -> None:
     logger.debug("Saving to disk")
     try:
-        directory_path = os.path.join(os.getcwd(), settings.FILE_STORAGE_PATH, project_id)
+        directory_path = os.path.join(os.getcwd(), 
+                                      settings.FILE_STORAGE_PATH, 
+                                      project_id)
         if not os.path.exists(directory_path):
             os.makedirs(directory_path)
             logger.info(f"Created directory: {directory_path}")

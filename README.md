@@ -10,10 +10,7 @@ This project implements a custom HTTP backend for Terraform using FastAPI. It pr
 
 ## Requirements
 
-- Python 3.7+
-- FastAPI
-- Uvicorn (for running the FastAPI application)
-- Pydantic
+see [requirements.txt](requirements.txt)
 
 ## Installation
 
@@ -26,7 +23,7 @@ git clone git@github.com:mikelv702/simple-terraform-backend.git
 2. Install the required packages:
 
 ```bash
-pip install fastapi
+uv pip install -r requirements.txt
 ```
 
 ## Usage

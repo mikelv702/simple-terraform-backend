@@ -6,7 +6,11 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import JSONResponse
 
 
-from .helpers.local_file_handler import save_file, read_file
+from .helpers.local_file_handler import (save_file, 
+                                         read_file, 
+                                         read_lock_file, 
+                                         delete_lock_file, 
+                                         save_lock_file)
 
 from .settings import settings
 
@@ -46,11 +50,12 @@ class TerraformState(BaseModel):
     class Config:
         extra = "allow"
         
-@app.api_route("/tfstate/lock", methods=["LOCK"])
-async def lock_state(lock: LockInfo):
-    global lock_info
+@app.api_route("/tfstate/{project_id}/lock", methods=["LOCK"])
+async def lock_state(project_id: int, lock: LockInfo):
+    lock_info = read_lock_file(project_id)
     if lock_info is None:
         lock_info = lock
+        save_lock_file(project_id, lock_info.model_dump())
         return JSONResponse(content=lock.model_dump(), status_code=200)
     else:
         return JSONResponse(
@@ -58,18 +63,19 @@ async def lock_state(lock: LockInfo):
             status_code=423
         )
 
-@app.api_route("/tfstate/lock", methods=["UNLOCK"])
-async def unlock_state(lock: LockInfo):
-    global lock_info
+@app.api_route("/tfstate/{project_id}/lock", methods=["UNLOCK"])
+async def unlock_state(project_id: int, lock: LockInfo):
+    lock_info = read_lock_file(project_id)
     if lock_info is None:
         raise HTTPException(status_code=404, detail="State is not locked")
-    if lock_info.ID != lock.ID:
+    if lock_info["ID"] != lock.ID:
         raise HTTPException(status_code=403, detail="Lock ID does not match")
-    lock_info = None
+    delete_lock_file(project_id)
     return Response(status_code=200)
 
-@app.get("/tfstate/lock")
-async def get_lock():
+@app.get("/tfstate/{project_id}/lock")
+async def get_lock(project_id: int):
+    lock_info = read_lock_file(project_id)
     if lock_info is None:
         return Response(status_code=404)
     return JSONResponse(content=lock_info.model_dump(), status_code=200)

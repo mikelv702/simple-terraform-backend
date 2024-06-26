@@ -31,6 +31,7 @@ uv pip install -r requirements.txt
 1. Start the FastAPI server:
 
 ```bash
+cd src/
 fastapi dev main.py
 ```
 

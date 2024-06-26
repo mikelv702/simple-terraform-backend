@@ -40,22 +40,15 @@ fastapi dev main.py
 ```hcl
 terraform {
   backend "http" {
-    address = "http://localhost:8000/tfstate"
-    lock_address = "http://localhost:8000/tfstate/lock"
-    unlock_address = "http://localhost:8000/tfstate/lock"
+    address = "http://localhost:8000/tfstate/${PROJECT_ID}"
+    lock_address = "http://localhost:8000/tfstate/${PROJECT_ID}/lock"
+    unlock_address = "http://localhost:8000/tfstate/${PROJECT_ID}/lock"
   }
 }
 ```
 
 3. Use Terraform as normal. The state will be stored and retrieved from your FastAPI backend.
 
-## API ENDPOINTS 
-
-- POST /tfstate: Update Terraform state
-- GET /tfstate: Retrieve Terraform state
-- LOCK /tfstate/lock: Acquire a state lock
-- UNLOCK /tfstate/lock: Release a state lock
-- GET /tfstate/lock: Retrieve current lock info
 
 ## Note
 
